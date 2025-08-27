@@ -1,0 +1,21 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Update DSIRE month chunk",
+        "type": "shell",
+        "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+        "args": [
+          "-m",
+          "derdata.dsire.update_dsire",
+          "--start",
+          "20180101",
+          "--end",
+          "20181231",
+          "--version_tag",
+          "VSDB_2025_08_w1"
+        ],
+        "problemMatcher": []
+      }
+    ]
+  }
