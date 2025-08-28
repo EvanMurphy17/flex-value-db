@@ -1,7 +1,9 @@
-from __future__ import annotations
+# derdata/dsire/update_dsire.py
 import argparse
 from datetime import datetime
 from pathlib import Path
+from time import sleep
+
 from tqdm import tqdm
 
 from derdata.dsire.client import DsireClient
@@ -16,13 +18,16 @@ DATA_DIR = ROOT / "data"
 RAW_DIR = DATA_DIR / "raw" / "dsire"
 STATE_FILE = DATA_DIR / "meta" / "state" / "dsire_last_pull.json"
 
+
 def save_state(last_end: str) -> None:
     ensure_dir(STATE_FILE.parent)
     STATE_FILE.write_text(f'{{"last_end":"{last_end}"}}', encoding="utf-8")
 
+
 def load_state() -> str | None:
     st = read_json(STATE_FILE)
-    return st.get("last_end") if st else None
+    return (st or {}).get("last_end")
+
 
 def cli() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="Fetch DSIRE programs JSON by date range")
@@ -32,7 +37,8 @@ def cli() -> argparse.Namespace:
     p.add_argument("--sleep_sec", type=float, default=0.0, help="Sleep between chunks")
     return p.parse_args()
 
-def main():
+
+def main() -> None:
     args = cli()
     client = DsireClient()
 
@@ -56,9 +62,12 @@ def main():
         data = client.get_programs_by_date(s_str, e_str)
         write_json_gz(data, fname)
         logger.info(f"Wrote {fname.name}")
+        if args.sleep_sec > 0:
+            sleep(args.sleep_sec)
 
     save_state(yyyymmdd(end))
     logger.info("Done")
+
 
 if __name__ == "__main__":
     main()

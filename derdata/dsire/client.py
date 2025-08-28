@@ -1,21 +1,31 @@
+# derdata/dsire/client.py
 from __future__ import annotations
+
+from typing import Any, TypeAlias
 import time
-from datetime import datetime
-from typing import Any, Dict
 
 import requests
 
-DSIRE_BASE = "http://programs.dsireusa.org/api/v1"
+# Precise alias for DSIRE JSON responses
+JSONLike: TypeAlias = dict[str, Any] | list[Any]
+
 
 class DsireClient:
     """
-    Thin client for the DSIRE Programs API
+    Thin client for the DSIRE Programs API.
 
-    Endpoints documented on DSIRE Data and Tools page
-    GET {base}/getprograms/json
-    GET {base}/getprogramsbydate/{YYYYMMDD}/{YYYYMMDD}/json
+    Endpoints:
+      - GET {base}/getprograms/json
+      - GET {base}/getprogramsbydate/{YYYYMMDD}/{YYYYMMDD}/json
     """
-    def __init__(self, base_url: str = DSIRE_BASE, timeout: int = 60, max_retries: int = 3, backoff_sec: float = 2.0):
+
+    def __init__(
+        self,
+        base_url: str = "http://programs.dsireusa.org/api/v1",
+        timeout: int = 60,
+        max_retries: int = 3,
+        backoff_sec: float = 2.0,
+    ) -> None:
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
         self.max_retries = max_retries
@@ -23,7 +33,7 @@ class DsireClient:
         self.session = requests.Session()
         self.session.headers.update({"User-Agent": "der-value-stack/0.1"})
 
-    def _request(self, url: str) -> Dict[str, Any] | list:
+    def _request(self, url: str) -> JSONLike:
         for attempt in range(1, self.max_retries + 1):
             try:
                 resp = self.session.get(url, timeout=self.timeout)
@@ -34,12 +44,10 @@ class DsireClient:
                     raise
                 time.sleep(self.backoff_sec * attempt)
 
-    def get_programs_all(self) -> Dict[str, Any] | list:
+    def get_programs_all(self) -> JSONLike:
         url = f"{self.base_url}/getprograms/json"
         return self._request(url)
 
-    def get_programs_by_date(self, start_yyyymmdd: str, end_yyyymmdd: str) -> Dict[str, Any] | list:
-        datetime.strptime(start_yyyymmdd, "%Y%m%d")
-        datetime.strptime(end_yyyymmdd, "%Y%m%d")
+    def get_programs_by_date(self, start_yyyymmdd: str, end_yyyymmdd: str) -> JSONLike:
         url = f"{self.base_url}/getprogramsbydate/{start_yyyymmdd}/{end_yyyymmdd}/json"
         return self._request(url)
