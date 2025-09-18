@@ -1,7 +1,12 @@
-requests==2.32.3
-tqdm==4.66.4
-python-dateutil==2.9.0.post0
-streamlit==1.38.0
-pandas==2.2.2
-python-dateutil==2.9.0.post0
+# core
+pandas>=2.2
+requests>=2.32
+python-dateutil>=2.9
+tqdm>=4.66
 pydantic>=2.7
+streamlit>=1.36
+python-dotenv
+
+# gridstatus + numpy pins for Py 3.12
+gridstatusio==0.14.0
+numpy==1.26.4

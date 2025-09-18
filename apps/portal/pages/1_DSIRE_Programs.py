@@ -1,17 +1,18 @@
-# --- make project root importable (so "derdata" is found) ---
+# apps/portal/pages/1_DSIRE_Programs.py
+from __future__ import annotations
+
 import sys
 from pathlib import Path
-
-PROJECT_ROOT = Path(__file__).resolve().parents[2]  # .../flex-value-db
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
-
-# apps/dsire_browser/app.py
 from typing import List, Tuple
 import re
 
 import pandas as pd
 import streamlit as st
+
+# make repo importable
+PROJECT_ROOT = Path(__file__).resolve().parents[3]  # .../flex-value-db
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from derdata.dsire.parse import build_tables
 
@@ -42,7 +43,6 @@ def load_processed_or_build(version_tag: str) -> Tuple[pd.DataFrame, pd.DataFram
     return programs_df, parameters_df
 
 
-st.set_page_config(page_title="DSIRE Program Browser", layout="wide")
 st.title("DSIRE Program Browser")
 
 versions = list_versions()
